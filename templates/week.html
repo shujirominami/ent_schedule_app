@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>耳鼻科 手術予定表（週）</title>
+  <style>
+    body { font-family: sans-serif; }
+    h2 { margin-top: 2em; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
+    th, td { border: 1px solid #ccc; padding: 2px 4px; font-size: 12px; }
+    th { background: #eee; }
+  </style>
+</head>
+<body>
+
+<h1>耳鼻科 手術予定表（週）</h1>
+
+<!-- 週のヘッダ（任意で和暦なども追加可能） -->
+<p>
+  週の開始日：{{ monday.strftime('%Y年%m月%d日') }}（月）
+</p>
+
+{% macro render_day(day, label) %}
+  <h2>{{ label }}曜日 {{ day.strftime('%m月%d日') }}</h2>
+  <table>
+    <tr>
+      <th>全/局</th>
+      <th>AM/PM</th>
+      <th>入院日</th>
+      <th>ID</th>
+      <th>氏名</th>
+      <th>年齢/性</th>
+      <th>術式</th>
+      <th>術者</th>
+      <th>備考</th>
+    </tr>
+    {% for s in by_day[day] %}
+      <tr>
+        <td>{{ s.anesthesia }}</td>
+        <td>{{ s.session }}</td>
+        <td>
+          {% if s.admission_date %}
+            {{ s.admission_date.strftime('%m/%d') }}
+          {% endif %}
+        </td>
+        <td>{{ s.patient_id }}</td>
+        <td>{{ s.patient_name }}</td>
+        <td>{{ s.age_sex }}</td>
+        <td>{{ s.procedure }}</td>
+        <td>{{ s.surgeon }}</td>
+        <td>{{ s.note }}</td>
+      </tr>
+    {% else %}
+      <tr>
+        <td colspan="9">予定なし</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endmacro %}
+
+{{ render_day(monday, '月') }}
+{{ render_day(tuesday, '火') }}
+{{ render_day(wednesday, '水') }}
+{{ render_day(friday, '金') }}
+
+<hr>
+
+<h2>新規登録</h2>
+<form method="post">
+  <label>手術日:
+    <input type="date" name="date" required>
+  </label><br>
+
+  <label>AM/PM:
+    <select name="session">
+      <option value="AM">AM</option>
+      <option value="PM">PM</option>
+    </select>
+  </label><br>
+
+  <label>麻酔（全/局など）:
+    <input type="text" name="anesthesia">
+  </label><br>
+
+  <label>入院日:
+    <input type="date" name="admission_date">
+  </label><br>
+
+  <label>ID:
+    <input type="text" name="patient_id">
+  </label><br>
+
+  <label>氏名:
+    <input type="text" name="patient_name">
+  </label><br>
+
+  <label>年齢/性:
+    <input type="text" name="age_sex" placeholder="5歳 M など">
+  </label><br>
+
+  <label>術式:
+    <input type="text" name="procedure" size="40">
+  </label><br>
+
+  <label>術者:
+    <input type="text" name="surgeon">
+  </label><br>
+
+  <label>備考:
+    <input type="text" name="note" size="60">
+  </label><br>
+
+  <button type="submit">登録</button>
+</form>
+
+</body>
+</html>
